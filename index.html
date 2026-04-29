@@ -1090,7 +1090,7 @@
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
       padding: clamp(28px, 4vw, 58px);
-      gap: clamp(18px, 2.2vw, 30px);
+      gap: clamp(10px, 1.2vw, 18px);
     }
 
     .brief-kicker {
@@ -1180,7 +1180,10 @@
       height: 100%;
       display: grid;
       grid-template-columns: 1fr;
-      gap: clamp(18px, 3vw, 42px);
+      grid-template-rows: auto auto;
+      align-content: center;
+      justify-items: center;
+      gap: clamp(10px, 1.2vw, 18px);
       place-items: center;
       text-align: center;
     }
@@ -1193,7 +1196,7 @@
     }
 
     .cta-copy {
-      margin: 18px auto 0;
+      margin: 12px auto 0;
       max-width: 560px;
       color: rgba(16,17,14,.62);
       font-size: clamp(15px, 1.4vw, 21px);
@@ -1204,7 +1207,7 @@
       width: min(92vw, 760px);
       display: grid;
       grid-template-columns: 1fr;
-      gap: 22px;
+      gap: clamp(10px, 1vw, 14px);
       justify-items: center;
     }
 
@@ -1259,6 +1262,7 @@
       isolation: isolate;
       width: min(100%, 420px);
       min-height: clamp(64px, 6.8vw, 92px);
+      margin-top: 0;
       border: 2px solid transparent;
       border-radius: 999px;
       background:
