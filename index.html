@@ -877,7 +877,10 @@
       font-size: clamp(38px, 5.8vw, 92px);
       line-height: .9;
       color: var(--ink);
-      overflow-wrap: anywhere;
+      overflow-wrap: normal;
+      word-break: normal;
+      hyphens: none;
+      text-wrap: balance;
     }
 
     .reason-copy {
@@ -912,7 +915,9 @@
       line-height: .94;
       letter-spacing: -.025em;
       text-transform: uppercase;
-      overflow-wrap: anywhere;
+      overflow-wrap: normal;
+      word-break: normal;
+      hyphens: none;
     }
 
     .reason span {
@@ -2254,7 +2259,7 @@
 
     const levelContent = {
       gentle: {
-        reasonTitle: "Бережный: вывозимый старт",
+        reasonTitle: "Бережный старт",
         reasonCopy: "Бережный Bootcamp помогает войти в регулярность без перегруза: меньше основных тренировок, больше пространства для восстановления.",
         r1Title: "Без перегруза",
         r1Text: "3 основные тренировки в неделю, чтобы тело успевало восстановиться.",
@@ -2275,7 +2280,7 @@
         secondDesc: "тренировок за курс: 6 утроворков, 3 основные и 6 черных ящиков в неделю."
       },
       main: {
-        reasonTitle: "Основной: коротко и жестко",
+        reasonTitle: "Основной ритм",
         reasonCopy: "Основной Bootcamp для тех, кто готов к плотной нагрузке, хочет рельеф, выносливость и больше тренировочного разнообразия.",
         r1Title: "Интенсив",
         r1Text: "6 основных тренировок в неделю плюс утроворки и восстановление.",
