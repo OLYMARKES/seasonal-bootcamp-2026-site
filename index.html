@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preload" as="image" href="assets/figma_bootcamp_hero_bg.jpg">
   <title>Bootcamp 2026 | Archive Cards Prototype</title>
   <style>
     :root {
@@ -294,12 +295,12 @@
     }
 
     .hero-bg-gentle {
-      background-image: url("assets/figma_bootcamp_hero_bg.png");
+      background-image: url("assets/figma_bootcamp_hero_bg.jpg");
       transform: translateX(0);
     }
 
     .hero-bg-main {
-      background-image: url("assets/figma_bootcamp_hero_bg_main.png");
+      background-image: url("assets/figma_bootcamp_hero_bg_main.jpg");
       transform: translateX(100%);
     }
 
@@ -1325,6 +1326,18 @@
         font-size: 10px;
       }
 
+      body::before {
+        opacity: .25;
+      }
+
+      .brandbar,
+      .theme-switch,
+      .figma-start,
+      .arrow,
+      .price-card {
+        backdrop-filter: none;
+      }
+
       .nav-dots {
         right: 10px;
         gap: 8px;
@@ -1347,6 +1360,7 @@
 
       .hero-bg {
         background-position: 58% 50%;
+        transition-duration: .48s;
       }
 
       .hero-bg::after {
@@ -1407,6 +1421,8 @@
         width: min(91vw, 460px);
         height: min(78svh, calc(100svh - 124px));
         padding: 0;
+        box-shadow: 0 22px 54px rgba(16,17,14,.16);
+        filter: none;
         transform:
           translateX(calc(var(--offset) * 27px))
           translateY(calc(var(--offset) * 7px))
@@ -1501,6 +1517,8 @@
         width: min(91vw, 460px);
         height: min(78svh, calc(100svh - 124px));
         border-radius: 28px;
+        box-shadow: 0 22px 54px rgba(0,0,0,.24);
+        filter: none;
         transform:
           translateX(calc(var(--offset) * 27px))
           translateY(calc(var(--offset) * 7px))
@@ -1622,6 +1640,11 @@
         min-height: 66px;
         font-size: 27px;
       }
+
+      .cta-button::before {
+        filter: blur(7px);
+        animation: gradient-shift 3s ease infinite;
+      }
     }
 
     @media (max-height: 720px) and (min-width: 861px) {
@@ -1688,39 +1711,39 @@
 
             <div class="stack" id="stack" tabindex="0">
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2041.png" alt="Bootcamp card 2041">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2041.jpg" alt="Bootcamp card 2041" decoding="async" fetchpriority="high">
               </article>
 
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2040.png" alt="Bootcamp card 2040">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2040.jpg" alt="Bootcamp card 2040" loading="lazy" decoding="async">
               </article>
 
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2042.png" alt="Bootcamp card 2042">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2042.jpg" alt="Bootcamp card 2042" loading="lazy" decoding="async">
               </article>
 
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2043.png" alt="Bootcamp card 2043">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2043.jpg" alt="Bootcamp card 2043" loading="lazy" decoding="async">
               </article>
 
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2044.png" alt="Bootcamp card 2044">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2044.jpg" alt="Bootcamp card 2044" loading="lazy" decoding="async">
               </article>
 
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2045.png" alt="Bootcamp card 2045">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2045.jpg" alt="Bootcamp card 2045" loading="lazy" decoding="async">
               </article>
 
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2046.png" alt="Bootcamp card 2046">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2046.jpg" alt="Bootcamp card 2046" loading="lazy" decoding="async">
               </article>
 
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2047.png" alt="Bootcamp card 2047">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2047.jpg" alt="Bootcamp card 2047" loading="lazy" decoding="async">
               </article>
 
               <article class="card">
-                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2038.png" alt="Bootcamp card 2038">
+                <img class="archive-card-img" src="assets/bootcamp_cards_archive/2038.jpg" alt="Bootcamp card 2038" loading="lazy" decoding="async">
               </article>
             </div>
 
@@ -2205,8 +2228,8 @@
   <script>
     const levelButtons = [...document.querySelectorAll("[data-level-value]")];
     const heroBackgrounds = [
-      "assets/figma_bootcamp_hero_bg.png",
-      "assets/figma_bootcamp_hero_bg_main.png"
+      "assets/figma_bootcamp_hero_bg.jpg",
+      "assets/figma_bootcamp_hero_bg_main.jpg"
     ];
 
     heroBackgrounds.forEach((src) => {
