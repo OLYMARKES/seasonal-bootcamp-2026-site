@@ -23,6 +23,7 @@
       --poster-bg: rgba(255,255,255,.055);
       --poster-ink: #fff8ec;
       --poster-line: rgba(255,248,236,.14);
+      --app-height: 100svh;
     }
 
     body[data-theme="light"] {
@@ -79,9 +80,19 @@
     .deck {
       position: relative;
       z-index: 1;
-      height: 100svh;
+      height: var(--app-height);
       width: 100vw;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .deck::-webkit-scrollbar {
+      display: none;
     }
 
     .brandbar {
@@ -187,19 +198,19 @@
     }
 
     .slides {
-      height: 100%;
+      height: auto;
       width: 100%;
-      transition: transform .72s cubic-bezier(.2, .9, .18, 1);
-      will-change: transform;
     }
 
     .slide {
-      height: 100svh;
+      height: var(--app-height);
       width: 100vw;
       display: grid;
       place-items: center;
       padding: clamp(16px, 3vw, 42px);
       overflow: hidden;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
     }
 
     .shell {
@@ -256,12 +267,12 @@
 
     .hero {
       width: 100vw;
-      height: 100svh;
+      height: var(--app-height);
       display: grid;
       place-items: center;
       padding: 0;
       max-width: none;
-      min-height: 100svh;
+      min-height: var(--app-height);
       overflow: hidden;
     }
 
@@ -1295,7 +1306,7 @@
 
       .shell {
         width: 100%;
-        height: calc(100svh - 24px);
+        height: calc(var(--app-height) - 24px);
       }
 
       .brandbar {
@@ -1354,7 +1365,7 @@
 
       .hero {
         width: 100vw;
-        height: 100svh;
+        height: var(--app-height);
         padding: 0;
       }
 
@@ -1419,7 +1430,7 @@
 
       .card {
         width: min(91vw, 460px);
-        height: min(78svh, calc(100svh - 124px));
+        height: min(78svh, calc(var(--app-height) - 124px));
         padding: 0;
         box-shadow: 0 22px 54px rgba(16,17,14,.16);
         filter: none;
@@ -1515,7 +1526,7 @@
 
       .brief-card {
         width: min(91vw, 460px);
-        height: min(78svh, calc(100svh - 124px));
+        height: min(78svh, calc(var(--app-height) - 124px));
         border-radius: 28px;
         box-shadow: 0 22px 54px rgba(0,0,0,.24);
         filter: none;
@@ -2335,16 +2346,35 @@
     }
 
     const slides = document.querySelector("#slides");
+    const deck = document.querySelector(".deck");
     const sections = [...document.querySelectorAll(".slide")];
     const sectionDots = document.querySelector("#sectionDots");
     let sectionIndex = 0;
-    let sectionLocked = false;
-    let touchStart = null;
+    let scrollRaf = null;
 
-    function isSectionSwipeIgnored(target) {
-      return Boolean(target?.closest?.(
-        ".stack, .brief-stack, .theme-switch, .arrow, .card-dots, .brief-dots, .cta-button, a, button"
-      ));
+    function appHeight() {
+      return Math.round(window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight);
+    }
+
+    function syncAppHeight() {
+      document.documentElement.style.setProperty("--app-height", `${appHeight()}px`);
+      if (deck) {
+        deck.scrollTo({ top: sectionIndex * appHeight(), behavior: "auto" });
+      }
+    }
+
+    function sectionSwipeZone(target) {
+      if (target?.closest?.(".theme-switch, .arrow, .card-dots, .brief-dots, .cta-button, a, button")) {
+        return "control";
+      }
+      if (target?.closest?.(".stack, .brief-stack")) {
+        return "carousel";
+      }
+      return "page";
+    }
+
+    function isMobileLayout() {
+      return window.matchMedia("(max-width: 860px)").matches;
     }
 
     sections.forEach((section, index) => {
@@ -2357,48 +2387,47 @@
 
     const sectionDotList = [...sectionDots.querySelectorAll("button")];
 
-    function goSection(nextIndex) {
+    function updateSectionState(nextIndex, shouldUpdateHash = true) {
       sectionIndex = Math.max(0, Math.min(sections.length - 1, nextIndex));
-      slides.style.transform = `translateY(${-sectionIndex * 100}svh)`;
       sectionDotList.forEach((dot, index) => {
         dot.setAttribute("aria-current", index === sectionIndex ? "true" : "false");
       });
       document.body.dataset.section = String(sectionIndex);
-      history.replaceState(null, "", `#${sections[sectionIndex].id}`);
-      sectionLocked = true;
-      window.setTimeout(() => { sectionLocked = false; }, 820);
+      const nextHash = `#${sections[sectionIndex].id}`;
+      if (shouldUpdateHash && window.location.hash !== nextHash) {
+        try {
+          history.replaceState(null, "", nextHash);
+        } catch (_) {}
+      }
+    }
+
+    function goSection(nextIndex, behavior = "smooth") {
+      const targetIndex = Math.max(0, Math.min(sections.length - 1, nextIndex));
+      updateSectionState(targetIndex);
+      deck?.scrollTo({ top: targetIndex * appHeight(), behavior });
     }
 
     function moveSection(direction) {
-      if (sectionLocked) return;
       goSection(sectionIndex + direction);
     }
 
     window.addEventListener("wheel", (event) => {
       if (Math.abs(event.deltaY) < 8) return;
-      event.preventDefault();
-      moveSection(event.deltaY > 0 ? 1 : -1);
-    }, { passive: false });
-
-    window.addEventListener("touchstart", (event) => {
-      if (isSectionSwipeIgnored(event.target)) {
-        touchStart = null;
-        return;
-      }
-      const touch = event.touches[0];
-      touchStart = { x: touch.clientX, y: touch.clientY };
     }, { passive: true });
 
-    window.addEventListener("touchend", (event) => {
-      if (!touchStart) return;
-      const touch = event.changedTouches[0];
-      const dx = touch.clientX - touchStart.x;
-      const dy = touch.clientY - touchStart.y;
-      touchStart = null;
-      if (Math.abs(dy) > 34 && Math.abs(dy) > Math.abs(dx) * 1.22) {
-        moveSection(dy < 0 ? 1 : -1);
-      }
+    deck?.addEventListener("scroll", () => {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = null;
+        const nextIndex = Math.round((deck.scrollTop || 0) / appHeight());
+        if (nextIndex !== sectionIndex) {
+          updateSectionState(nextIndex);
+        }
+      });
     }, { passive: true });
+
+    window.addEventListener("resize", syncAppHeight, { passive: true });
+    window.visualViewport?.addEventListener("resize", syncAppHeight, { passive: true });
 
     window.addEventListener("keydown", (event) => {
       if (event.key === "ArrowDown" || event.key === "PageDown") moveSection(1);
@@ -2486,6 +2515,10 @@
       dragStart = null;
       if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(dy) * 1.12 && Math.abs(power) > 5200) {
         paginateCards(dx < 0 ? 1 : -1);
+        return;
+      }
+      if (Math.abs(dy) > 42 && Math.abs(dy) > Math.abs(dx) * 1.16) {
+        moveSection(dy < 0 ? 1 : -1);
       }
     });
 
@@ -2571,6 +2604,10 @@
       briefDragStart = null;
       if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(dy) * 1.12 && Math.abs(power) > 5200) {
         paginateBrief(dx < 0 ? 1 : -1);
+        return;
+      }
+      if (Math.abs(dy) > 42 && Math.abs(dy) > Math.abs(dx) * 1.16) {
+        moveSection(dy < 0 ? 1 : -1);
       }
     });
 
@@ -2580,7 +2617,8 @@
 
     const hashIndex = sections.findIndex((section) => `#${section.id}` === window.location.hash);
     setLevel("gentle");
-    goSection(hashIndex >= 0 ? hashIndex : 0);
+    syncAppHeight();
+    goSection(hashIndex >= 0 ? hashIndex : 0, "auto");
     renderCards();
     renderBriefCards();
   </script>
