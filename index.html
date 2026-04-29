@@ -543,6 +543,7 @@
       place-items: center;
       perspective: 1200px;
       touch-action: pan-y;
+      overscroll-behavior: contain;
       user-select: none;
       outline: 0;
     }
@@ -1028,6 +1029,7 @@
       place-items: center;
       perspective: 1200px;
       touch-action: pan-y;
+      overscroll-behavior: contain;
       user-select: none;
       outline: 0;
     }
@@ -1355,9 +1357,10 @@
         width: min(62vw, 420px);
         transform:
           perspective(900px)
-          translate3d(var(--move-x), calc(8vh + var(--move-y)), 0)
-          rotateX(var(--tilt-x))
-          rotateY(var(--tilt-y));
+          translate3d(0, 8vh, 0)
+          rotateX(0deg)
+          rotateY(0deg);
+        transition: none;
       }
 
       .figma-start {
@@ -2274,6 +2277,7 @@
 
     const hero = document.querySelector("#hero");
     const heroLogo = document.querySelector(".figma-hero-logo");
+    const canTiltHero = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
     function setHeroTilt(event) {
       if (!hero || !heroLogo) return;
@@ -2300,7 +2304,7 @@
       heroLogo.style.setProperty("--move-y", "0px");
     }
 
-    if (hero && heroLogo) {
+    if (hero && heroLogo && canTiltHero) {
       hero.addEventListener("pointermove", setHeroTilt);
       hero.addEventListener("pointerdown", setHeroTilt);
       hero.addEventListener("pointerleave", resetHeroTilt);
@@ -2313,6 +2317,12 @@
     let sectionIndex = 0;
     let sectionLocked = false;
     let touchStart = null;
+
+    function isSectionSwipeIgnored(target) {
+      return Boolean(target?.closest?.(
+        ".stack, .brief-stack, .theme-switch, .arrow, .card-dots, .brief-dots, .cta-button, a, button"
+      ));
+    }
 
     sections.forEach((section, index) => {
       const dot = document.createElement("button");
@@ -2348,6 +2358,10 @@
     }, { passive: false });
 
     window.addEventListener("touchstart", (event) => {
+      if (isSectionSwipeIgnored(event.target)) {
+        touchStart = null;
+        return;
+      }
       const touch = event.touches[0];
       touchStart = { x: touch.clientX, y: touch.clientY };
     }, { passive: true });
